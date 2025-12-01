@@ -1,24 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
 import Footer from './components/Footer';
+import Home from './components/Home';
+import About from './components/pages/About';
+import Contact from './components/pages/Contact';
+import Gallery from './components/pages/Gallery';
+import Shop from './components/pages/Shop';
+import Patients from './components/pages/Patients';
+import Services from './components/Services';
+import TeamPage from './components/pages/TeamPage';
+import { NavigateFunction } from './types';
 
 const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [currentServiceTab, setCurrentServiceTab] = useState<string | undefined>(undefined);
+
+  const handleNavigate: NavigateFunction = (page, params) => {
+    setCurrentPage(page);
+    if (params) {
+      setCurrentServiceTab(params);
+    } else {
+      setCurrentServiceTab(undefined);
+    }
+    // Reset scroll position
+    window.scrollTo(0, 0);
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return <Home onNavigate={handleNavigate} />;
+      case 'services':
+        return <Services initialTab={currentServiceTab} />;
+      case 'about':
+        return <About />;
+      case 'team':
+        return <TeamPage />;
+      case 'patients':
+        return <Patients />;
+      case 'contact':
+        return <Contact />;
+      case 'gallery':
+        return <Gallery />;
+      case 'shop':
+        return <Shop />;
+      default:
+        return <Home onNavigate={handleNavigate} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white relative">
-      <Navbar />
+    <div className="bg-navy-900 min-h-screen relative selection:bg-pastel-blue selection:text-navy-900 font-sans">
+      <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
       <main>
-        <Hero />
-        {/* Placeholder for content below the fold to allow scrolling if needed */}
-        <section className="py-20 bg-gray-50 text-center">
-          <h2 className="text-3xl font-serif text-gray-800 mb-4">Our Premium Dental Services</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Experience world-class dental care with our dedicated team of professionals.
-            We treat you like family because you represent our family.
-          </p>
-        </section>
+        {renderPage()}
       </main>
-      <Footer />
+      {/* Footer is strictly Navy, so we ensure it sits nicely */}
+      {currentPage !== 'home' && <Footer />}
     </div>
   );
 };

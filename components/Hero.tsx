@@ -1,68 +1,96 @@
-import React, { useState } from 'react';
-import GeometricOverlay from './GeometricOverlay';
+import React, { useState, useEffect } from 'react';
+import { NavigateFunction } from '../types';
+import { ArrowRight } from 'lucide-react';
 
-const Hero: React.FC = () => {
+interface HeroProps {
+  onNavigate?: NavigateFunction;
+}
+
+const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   return (
-    <section className="relative w-full h-screen min-h-[700px] overflow-hidden bg-navy-900 flex items-center">
-      {/* Background Image Layer */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/DSCF0464.jpg"
-          alt="Clinic Background"
-          className="w-full h-full object-cover opacity-90"
-        />
-        {/* Dark gradient from left to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/70 via-navy-900/40 to-transparent"></div>
-      </div>
+    <section className="relative w-full h-screen min-h-[800px] bg-navy-900 flex flex-col justify-center overflow-hidden">
+      
+      {/* GEOMETRIC BACKGROUND */}
+      <div 
+        className={`absolute top-0 right-0 w-[80vw] h-[100vh] bg-gradient-to-b from-pastel-blue/10 to-transparent transform origin-top-right transition-transform duration-1000 ease-out ${isLoaded ? 'scale-100' : 'scale-0'}`}
+        style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
+      ></div>
 
-      {/* Geometric Decoration Layer */}
-      <GeometricOverlay />
+      <div 
+        className={`absolute bottom-0 left-0 w-[50vw] h-[50vh] bg-white/5 transform transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20'}`}
+        style={{ clipPath: 'polygon(0 100%, 100% 100%, 0 0)' }}
+      ></div>
 
-      {/* Main Content Container */}
-      <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-center">
+      <div className="container mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center h-full">
         
-        {/* Text Content */}
-        <div className="w-full lg:w-2/3 xl:w-1/2 pt-20 lg:pt-0">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-tight mb-2 drop-shadow-lg">
-            Keith Nelson <br />
-            <span className="text-4xl md:text-5xl lg:text-6xl opacity-90">& Associates</span>
-          </h1>
-          
-          <div className="w-24 h-1 bg-blue-400/50 my-6 rounded-full"></div>
-          
-          <h2 className="text-2xl md:text-3xl font-serif text-white/90 mb-10 tracking-wide">
-            The Dental Family for <span className="font-semibold italic">Your</span> Family
-          </h2>
+        {/* Left: Typography */}
+        <div className="flex flex-col justify-center pt-20 lg:pt-0">
+            <div className={`w-24 h-1 bg-pastel-blue mb-10 transition-all duration-700 delay-300 ${isLoaded ? 'w-24 opacity-100' : 'w-0 opacity-0'}`}></div>
+            
+            <div className="relative mb-8">
+                <h1 className="flex flex-col text-6xl md:text-8xl font-black uppercase text-white leading-[0.8] tracking-tighter">
+                    {/* WHITE: Horizontal Animation */}
+                    <span className={`block transition-all duration-1000 ease-out transform ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
+                      Keith
+                    </span>
+                    <span className={`block transition-all duration-1000 delay-100 ease-out transform ${isLoaded ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>
+                      Nelson
+                    </span>
+                    {/* BLUE: Vertical Animation */}
+                    <span className={`block text-pastel-blue transition-all duration-1000 delay-300 ease-out transform ${isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+                      & Associates.
+                    </span>
+                </h1>
+            </div>
 
-          <button className="bg-navy-800 text-white px-10 py-4 rounded-full text-lg font-medium hover:bg-navy-900 hover:scale-105 transition-all duration-300 shadow-xl border border-white/10 ring-4 ring-white/5">
-            Bookings
-          </button>
+            <div className={`mb-10 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+              <p className="text-white/90 text-2xl font-light max-w-lg leading-relaxed">
+                  The Dental Family for your family.
+              </p>
+              <p className="text-pastel-blue text-xs font-bold uppercase tracking-widest mt-3">
+                  Serving Auckland Since 1985
+              </p>
+            </div>
+
+            <div className={`flex flex-wrap gap-4 transition-all duration-700 delay-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <button 
+                  onClick={() => onNavigate && onNavigate('contact')}
+                  className="group bg-pastel-blue text-navy-900 px-8 py-5 font-bold uppercase tracking-widest text-sm hover:bg-white transition-all duration-300 flex items-center gap-3"
+                >
+                    Book Appointment 
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button 
+                  onClick={() => onNavigate && onNavigate('services')}
+                  className="px-8 py-5 font-bold uppercase tracking-widest text-sm text-white border border-white/20 hover:bg-white/10 transition-colors"
+                >
+                    Our Services
+                </button>
+            </div>
         </div>
 
-        {/* Team Image Section */}
-        <div className="absolute bottom-0 right-0 hidden lg:block w-[55%] max-w-4xl pointer-events-none">
-             <div className="relative">
-                <img 
-                  src="/5962.png" 
-                  alt="Dental Team"
-                  onLoad={() => setIsLoaded(true)}
-                  className={`w-full h-auto object-contain drop-shadow-2xl transition-all duration-1000 ease-out transform ${
-                    isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                />
+        {/* Right: Image Composition */}
+        <div className={`hidden lg:block relative h-full w-full transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+             <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="absolute w-[90%] h-[80%] bg-gradient-to-tr from-navy-800 to-transparent z-0 opacity-50"
+                    style={{ clipPath: 'polygon(20% 0%, 100% 0, 100% 100%, 0% 100%)' }}
+                  ></div>
+                  
+                  <img 
+                    src="/team.png" 
+                    alt="Dental Team" 
+                    className="relative z-10 w-[90%] max-w-xl object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-500" 
+                  />
              </div>
         </div>
-      </div>
-      
-      {/* Mobile Team Image */}
-      <div className="lg:hidden absolute bottom-0 right-0 w-3/4 opacity-40 z-0">
-          <img 
-            src="/5962.png" 
-            alt="Dental Team Mobile"
-            className="w-full h-auto object-cover mask-image-bottom"
-          />
+
       </div>
     </section>
   );

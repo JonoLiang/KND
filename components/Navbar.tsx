@@ -1,102 +1,127 @@
 import React, { useState, useEffect } from 'react';
 import { Instagram, Facebook, Menu, X } from 'lucide-react';
-import { NavLink } from '../types';
+import { NavLink, NavigateFunction } from '../types';
 
 const navLinks: NavLink[] = [
-  { label: 'Services', href: '#services' },
-  { label: 'About', href: '#about' },
-  { label: 'Team', href: '#team' },
-  { label: 'Contact', href: '#contact' },
-  { label: 'Gallery', href: '#gallery' },
-  { label: 'Shop', href: '#shop' },
+  { label: 'Home', href: 'home' },
+  { label: 'About', href: 'about' },
+  { label: 'Team', href: 'team' },
+  { label: 'Services', href: 'services' },
+  { label: 'Patients', href: 'patients' },
+  { label: 'Contact', href: 'contact' },
+  { label: 'Gallery', href: 'gallery' },
+  { label: 'Shop', href: 'shop' },
 ];
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onNavigate: NavigateFunction;
+  currentPage: string;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavClick = (page: string) => {
+    onNavigate(page);
+    setIsMobileMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
+  // Determine navbar background based on current page/scroll
+  // Home: Starts Transparent (on Navy), becomes Solid Navy
+  // Others: Solid Navy
+  const navClasses = isScrolled || currentPage !== 'home'
+    ? 'bg-navy-900 border-b border-white/10 py-4'
+    : 'bg-transparent py-6 border-b border-white/10';
+
   return (
-    <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-navy-900/95 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-6'
-      }`}
-    >
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo Section */}
-        <div className="flex items-center">
-          <div className="flex items-center justify-center mr-4">
-             <img src="/logo.png" alt="Keith Nelson & Associates" className="h-12 w-auto object-contain" />
+    <>
+      <header
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${navClasses}`}
+      >
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          {/* Logo Section */}
+          <div className="flex items-center cursor-pointer group" onClick={() => handleNavClick('home')}>
+             <h1 className="text-2xl font-bold text-white tracking-tighter border-2 border-white p-2">
+                KN<span className="text-pastel-blue">&</span>A
+             </h1>
           </div>
-        </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-8">
-          {navLinks.map((link, index) => (
-            <a
-              key={index}
-              href={link.href}
-              className="text-white/90 hover:text-white text-sm font-sans tracking-wide uppercase transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            {navLinks.map((link, index) => (
+              <button
+                key={index}
+                onClick={() => handleNavClick(link.href)}
+                className={`relative text-xs font-bold tracking-widest uppercase transition-all duration-300 hover:text-pastel-blue ${
+                  currentPage === link.href 
+                    ? 'text-pastel-blue underline underline-offset-8 decoration-2' 
+                    : 'text-white'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+          </nav>
 
-        {/* Right Actions */}
-        <div className="hidden lg:flex items-center space-x-6">
-          <div className="flex space-x-4 border-r border-white/30 pr-6">
-            <a href="#" className="text-white hover:text-blue-300 transition-colors">
-              <Instagram size={18} />
-            </a>
-            <a href="#" className="text-white hover:text-blue-300 transition-colors">
-              <Facebook size={18} />
-            </a>
+          {/* Right Actions */}
+          <div className="hidden lg:flex items-center space-x-8">
+            <div className="flex space-x-6 border-r border-white/20 pr-8">
+              <a href="#" className="text-white hover:text-pastel-blue transition-colors">
+                <Instagram size={20} />
+              </a>
+              <a href="#" className="text-white hover:text-pastel-blue transition-colors">
+                <Facebook size={20} />
+              </a>
+            </div>
+            <button className="bg-pastel-blue text-navy-900 hover:bg-white hover:text-navy-900 text-xs font-bold tracking-widest uppercase px-6 py-3 rounded-sm transition-all duration-300 shadow-none border border-transparent">
+              Bookings
+            </button>
           </div>
-          <button className="bg-navy-800 hover:bg-navy-900 text-white text-sm px-6 py-2 rounded-full transition-all border border-white/10 shadow-lg">
-            Bookings
+
+          {/* Mobile Menu Button */}
+          <button
+            className="lg:hidden text-white p-2 rounded-sm hover:bg-white/10 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          className="lg:hidden text-white"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
+      </header>
 
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-navy-900 border-t border-white/10 py-6 px-6 flex flex-col space-y-4 shadow-2xl">
+      <div 
+        className={`fixed inset-0 z-40 bg-navy-900 transition-transform duration-500 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col items-center justify-center h-full space-y-8 p-8">
           {navLinks.map((link, index) => (
-            <a
+            <button
               key={index}
-              href={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="text-white/90 hover:text-white text-lg font-sans"
+              onClick={() => handleNavClick(link.href)}
+              className="text-4xl font-bold text-white hover:text-pastel-blue transition-colors uppercase tracking-tight"
             >
               {link.label}
-            </a>
+            </button>
           ))}
-          <div className="flex items-center space-x-6 pt-4 border-t border-white/10">
-            <a href="#" className="text-white"><Instagram size={24} /></a>
-            <a href="#" className="text-white"><Facebook size={24} /></a>
+          <div className="pt-12 w-full max-w-xs">
+            <button className="w-full bg-pastel-blue text-navy-900 px-6 py-4 rounded-sm text-sm font-bold uppercase tracking-widest">
+              Book Appointment
+            </button>
           </div>
-          <button className="bg-white text-navy-900 font-bold py-3 rounded text-center">
-            Bookings
-          </button>
         </div>
-      )}
-    </header>
+      </div>
+    </>
   );
 };
 
